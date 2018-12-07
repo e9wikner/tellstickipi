@@ -1,0 +1,10 @@
+[Unit]
+Description=check that the tellstick_sensorlog service is recieving
+OnFailure=notify_service_status@%n.service
+
+[Service]
+Type=simple
+ExecStart=/usr/lib/virtualenv/tellsticklogger/bin/python /usr/local/bin/tellstick_sensorlog_is_alive -v --ignore 10 89 109 139 --timeout 3600
+
+[Install]
+WantedBy=multi-user.target

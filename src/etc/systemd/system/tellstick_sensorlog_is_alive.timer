@@ -1,0 +1,10 @@
+[Unit]
+Description=check that the tellstick_sensorlog service is recieving
+
+[Timer]
+OnBootSec=240
+OnCalendar=hourly
+Persistent=true
+
+[Install]
+WantedBy=timers.target

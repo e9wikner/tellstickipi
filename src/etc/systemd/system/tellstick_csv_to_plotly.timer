@@ -1,0 +1,10 @@
+[Unit]
+Description=fetching data from csv files and update plots at Plot.ly
+
+[Timer]
+OnBootSec=240
+OnCalendar=daily
+Persistent=false
+
+[Install]
+WantedBy=timers.target

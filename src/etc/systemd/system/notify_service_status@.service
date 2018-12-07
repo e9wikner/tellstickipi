@@ -1,0 +1,11 @@
+# Set "NOTIFY_EMAIL=..." in /etc/systemd/notify.conf
+[Unit]
+Description=email notification of %I status
+
+[Service]
+Type=oneshot
+EnvironmentFile=/etc/systemd/system/notify.conf
+ExecStart=/usr/local/bin/systemd_email.sh %i
+
+[Install]
+WantedBy=multi-user.target

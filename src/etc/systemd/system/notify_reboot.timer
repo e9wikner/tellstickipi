@@ -1,0 +1,9 @@
+[Unit]
+Description=send email on reboot
+
+[Timer]
+OnBootSec=60
+Unit=notify_reboot.service
+
+[Install]
+WantedBy=multi-user.target
