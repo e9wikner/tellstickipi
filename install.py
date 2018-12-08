@@ -39,7 +39,7 @@ def setup_telldus():
     """ Sets up the telldus core service.
     """
     telldus_source = 'deb-src http://download.telldus.com/debian/ unstable main' 
-    with open('/etc/apt/sources.list.d/telldus.list', mode='r+') as f:
+    with open('/etc/apt/sources.list.d/telldus.list', mode='w+') as f:
         lines = f.read().splitlines()
         if not telldus_source in lines:
             f.write(telldus_source)
