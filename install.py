@@ -87,7 +87,7 @@ def setup_telldus():
 
 def create_virtualenv(user, packages):
     virtualenv = VIRTUALENV_ROOT / user
-    run('python3 -m venv ' + virtualenv) 
+    run('python3 -m venv {}'.format(virtualenv))
     run('chown -R {0}:{0} {1}'.format(user, virtualenv))
 
 
