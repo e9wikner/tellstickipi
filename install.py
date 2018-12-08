@@ -117,6 +117,7 @@ def setup_homeassistant():
     user = 'homeassistant'
     useradd(user, groups='dialout,gpio')
     create_virtualenv(user, user)
+    run('{}/homeassistant/bin/pip install wheel'.format(VIRTUALENV_ROOT))
 
 
 def deploy():
