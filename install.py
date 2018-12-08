@@ -6,6 +6,8 @@ import getpass
 import os
 from pathlib import Path
 import subprocess
+import tempfile
+from urllib import request
 
 VIRTUALENV_PATH = '/usr/lib/virtualenv'
 PIP_REQUIREMENTS = ('git+https://github.com/e9wikner/tellsticklogger.git',)
@@ -16,7 +18,7 @@ USER = getpass.getuser()
 @contextmanager
 def cd(other):
     try:
-        this = Path.cwd()
+        this = os.getcwd()
         os.chdir(other)
         yield
     finally:
@@ -26,26 +28,38 @@ def cd(other):
 def run(commandstring):
     print(commandstring)
     subprocess.check_call(commandstring.split())
+ 
+
+def curl(url):
+    with request.urlopen(url) as f:
+        return(f.read())
 
 
 def setup_telldus():
     """ Sets up the telldus core service.
     """
-    run('echo "deb-src http://download.telldus.com/debian/ stable main" >> '
-        '/etc/apt/sources.list.d/telldus.list')
-    run('wget http://download.telldus.se/debian/telldus-public.key')
-    run('apt-key add telldus-public.key')
-    run('apt-get update -yq')
-    run('apt-get install build-essential -yq')
-    run('apt-get build-dep telldus-core -yq')
-    run('apt-get install cmake libconfuse-dev libftdi-dev help2man python3 '
-         'python-virtualenv -yq')
+    telldus_source = 'deb-src http://download.telldus.com/debian/ unstable main' 
+    with open('/etc/apt/sources.list.d/telldus.list', mode='r+') as f:
+        lines = f.read().splitlines()
+        if not telldus_source in lines:
+            f.write(telldus_source)
+
+    public_key = curl('http://download.telldus.com/debian/telldus-public.key')
+    with tempfile.NamedTemporaryFile(buffering=0) as keyfile:
+        keyfile.write(public_key)
+        run('apt-key add {}'.format(keyfile.name))
+
+    run('apt update -y')
+    run('apt install build-essential -y')
+    run('apt build-dep telldus-core -y')
+    run('apt install cmake libconfuse-dev libftdi-dev help2man python3 '
+         'python-virtualenv -y')
 
     tempdir = Path('/tmp').mkdir('telldus-temp', exist_ok=True)
 
     with cd('telldus-temp'):
-        run('apt-get --compile source telldus-core -yq')
-        run('dpkg --install *.deb')
+        run('apt --compile source telldus-core -yq')
+        #run('dpkg --install *.deb')
 
     assert Path('/etc/init.d/telldusd').exists()
 
@@ -53,10 +67,14 @@ def setup_telldus():
 def setup():
     """ Creates a virtual environment and install required packages
     """
-    run('apt-get install python3 -yq')
-
-    if not Path('/etc/init.d/telldusd').exists():
+    run('apt install python3 -yq')
+    telldus_daemon_init = Path('/etc/init.d/telldusd')
+    if not telldus_daemon_init.exists():
         setup_telldus()
+    else:
+        print('Skip telldus install since {} already exists'
+              .format(telldus_daemon_init))
+
 
     if not Path(VIRTUALENV_PATH).exists():
         run('mkdir -p ' + VIRTUALENV_PATH)
@@ -91,6 +109,7 @@ def update():
 
 def main():
     setup()
+    setup_telldus()
     deploy()
 
 
