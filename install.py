@@ -4,6 +4,7 @@ from datetime import datetime
 import getpass
 import os
 from pathlib import Path
+import shutil
 import subprocess
 import tempfile
 from urllib import request
@@ -57,22 +58,29 @@ def install_build_dependencies():
          'python-virtualenv -y')
 
 
-def build_and_install():
+def build():
     """Perform telldus-core build and install it"""
     tempdir = Path('/tmp/telldus-temp')
     tempdir.mkdir(exist_ok=True)
     with cd(tempdir):
         run('apt --compile source telldus-core -yq')
-    run('dpkg --install {}/*.deb'.format(tempdir))
+    return tempdir
+
+
+def install_telldus(build_dir)
+    run('dpkg --install {}/*.deb'.format(build_dir))
 
 
 def setup_telldus():
     """ Sets up the telldus core service"""
     apt_configure_telldus_repository()
     install_build_dependencies()
-    build_and_install()
 
+    builddir = build()
+    install_telldus(builddir)
     assert Path('/etc/init.d/telldusd').exists()
+
+    shutil.rmtree(builddir.name, ignore_errors=True)
 
 
 def setup():
