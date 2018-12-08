@@ -67,7 +67,8 @@ def build():
 
 
 def install_telldus():
-    run('dpkg --install {}/*.deb'.format(BUILD_PATH))
+    for deb_package in BUILD_PATH.glob('*.deb'):
+        run('dpkg --install {}'.format(deb_package))
 
 
 def setup_telldus():
