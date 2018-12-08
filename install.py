@@ -112,7 +112,7 @@ def deploy():
     backup_dir = 'backup/' + str(datetime.now().timestamp())
     os.makedirs(backup_dir)
     exclude_list = ['*.pyc', '.DS_Store', '.Apple*', '__pycache__', '.ipynb*']
-    run('rsync -thrv src/ / --backup-dir {} --dry-run'.format(backup_dir))
+    run('rsync --checksum --recursive -hv src/ / --backup-dir {}'.format(backup_dir))
     run("mkdir -p /var/lib/tellsticklogger")
     run("systemctl daemon-reload")
     run("chmod +x /usr/local/bin -R")
