@@ -93,6 +93,17 @@ def create_virtualenv(user, packages):
     run('chown -R {0}:{0} {1}'.format(user, virtualenv))
 
 
+def useradd(user, groups=None):
+    try:
+        run('useradd -rm {}'.format(user))
+    except subprocess.CalledProcessError as error:
+        if 9 == error.returncode:
+            print(user ' already exists')
+        else:
+            raise
+    if groups:
+        run('usermod --groups {} {}'.format(groups, user))
+
 def setup_tellsticklogger():
     """ Create a virtual environment and install required packages"""
     user = 'telldus'
@@ -104,7 +115,7 @@ def setup_tellsticklogger():
 def setup_homeassistant():
     """Create a virtual environment and install packages"""
     user = 'homeassistant'
-    run('useradd -rm {} -G dialout,gpio'.format(user))
+    useradd(user, groups='dialout,gpio')
     create_virtualenv(user, user)
 
 
