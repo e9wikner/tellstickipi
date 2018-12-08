@@ -13,7 +13,7 @@ VIRTUALENV_ROOT = Path('/usr/lib/virtualenv')
 TELLSTICKLOGGER_URL = 'git+https://github.com/e9wikner/tellsticklogger.git'
 BUILD_PATH = Path('/tmp/telldus-temp')
 TELLDUS_DAEMON_INIT = Path('/etc/init.d/telldusd')
-SERVICES = 'tellstick_sensorlog homeassistant@home-assistant'
+SERVICES = 'tellstick_sensorlog homeassistant@homeassistant'
 USER = getpass.getuser()
 
 
@@ -144,7 +144,7 @@ def deploy():
 
 def start():
     """Startup tellsticklogger and homeassistant"""
-    run("systemctl restart " + SERVICES)
+    run("systemctl start " + SERVICES)
     run("systemctl enable " + SERVICES)
 
 
@@ -158,7 +158,8 @@ def main():
     setup_homeassistant()
     deploy()
     start()
-    print('Visit homeassistant at localhost:8123')
+    print('Setup is finished and homeassistant is launching at localhost:8123')
+
     cleanup()
 
 
