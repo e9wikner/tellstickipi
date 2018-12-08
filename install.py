@@ -12,6 +12,7 @@ from urllib import request
 VIRTUALENV_PATH = '/usr/lib/virtualenv'
 PIP_REQUIREMENTS = ('git+https://github.com/e9wikner/tellsticklogger.git',)
 PY = VIRTUALENV_PATH + '/tellsticklogger/bin/python'
+BUILD_PATH = Path('/tmp/telldus-temp')
 USER = getpass.getuser()
 
 
@@ -60,15 +61,13 @@ def install_build_dependencies():
 
 def build():
     """Perform telldus-core build and install it"""
-    tempdir = Path('/tmp/telldus-temp')
-    tempdir.mkdir(exist_ok=True)
-    with cd(tempdir):
+    BUILD_PATH.mkdir(exist_ok=True) 
+    with cd(BUILD_PATH):
         run('apt --compile source telldus-core -yq')
-    return tempdir
 
 
-def install_telldus(build_dir)
-    run('dpkg --install {}/*.deb'.format(build_dir))
+def install_telldus():
+    run('dpkg --install {}/*.deb'.format(BUILD_PATH))
 
 
 def setup_telldus():
@@ -76,8 +75,8 @@ def setup_telldus():
     apt_configure_telldus_repository()
     install_build_dependencies()
 
-    builddir = build()
-    install_telldus(builddir)
+    build()
+    install_telldus()
     assert Path('/etc/init.d/telldusd').exists()
 
     shutil.rmtree(builddir.name, ignore_errors=True)
