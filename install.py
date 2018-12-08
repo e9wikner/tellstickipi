@@ -63,7 +63,7 @@ def build_and_install():
     tempdir.mkdir(exist_ok=True)
     with cd(tempdir):
         run('apt --compile source telldus-core -yq')
-        run('dpkg --install *.deb')
+    run('dpkg --install {}/*.deb'.format(tempdir))
 
 
 def setup_telldus():
