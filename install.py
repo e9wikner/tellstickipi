@@ -94,7 +94,7 @@ def create_virtualenv(user, packages):
 def setup_tellsticklogger():
     """ Create a virtual environment and install required packages"""
     user = 'telldus'
-    run('useradd -rm {}'.format(user))
+    # run('useradd -rm {}'.format(user))
     setup_telldus()
     create_virtualenv(user, TELLSTICKLOGGER_URL)
 
