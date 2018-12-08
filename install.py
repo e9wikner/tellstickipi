@@ -9,10 +9,10 @@ import subprocess
 import tempfile
 from urllib import request
 
-VIRTUALENV_PATH = '/usr/lib/virtualenv'
-PIP_REQUIREMENTS = ('git+https://github.com/e9wikner/tellsticklogger.git',)
-PY = VIRTUALENV_PATH + '/tellsticklogger/bin/python'
+VIRTUALENV_ROOT = Path('/usr/lib/virtualenv')
+TELLSTICKLOGGER_URL = ('git+https://github.com/e9wikner/tellsticklogger.git',)
 BUILD_PATH = Path('/tmp/telldus-temp')
+TELLDUS_DAEMON_INIT = Path('/etc/init.d/telldusd')
 USER = getpass.getuser()
 
 
@@ -55,11 +55,10 @@ def install_build_dependencies():
     run('apt update -y')
     run('apt install build-essential -y')
     run('apt build-dep telldus-core -y')
-    run('apt install cmake libconfuse-dev libftdi-dev help2man python3 '
-         'python-virtualenv -y')
+    run('apt install cmake libconfuse-dev libftdi-dev help2man python3 -y')
 
 
-def build():
+def build_telldus():
     """Perform telldus-core build and install it"""
     shutil.rmtree(str(BUILD_PATH))
     BUILD_PATH.mkdir(exist_ok=True) 
@@ -74,35 +73,37 @@ def install_telldus():
 
 def setup_telldus():
     """ Sets up the telldus core service"""
+    if TELLDUS_DAEMON_INIT.exists():
+        print('Skip telldus install since {} already exists'
+              .format(TELLDUS_DAEMON_INIT))
+        return
+
     apt_configure_telldus_repository()
     install_build_dependencies()
 
-    build()
+    build_telldus()
     install_telldus()
     assert Path('/etc/init.d/telldusd').exists()
 
-    shutil.rmtree(str(BUILD_PATH), ignore_errors=True)
+def create_virtualenv(user, packages):
+    virtualenv = VIRTUALENV_ROOT / user
+    run('python3 -m venv ' + virtualenv) 
+    run('chown -R {0}:{0} {1}'.format(user, virtualenv))
 
 
-def setup():
-    """ Creates a virtual environment and install required packages"""
-    run('apt install python3 -yq')
-    telldus_daemon_init = Path('/etc/init.d/telldusd')
-    if not telldus_daemon_init.exists():
-        setup_telldus()
-    else:
-        print('Skip telldus install since {} already exists'
-              .format(telldus_daemon_init))
+def setup_tellsticklogger():
+    """ Create a virtual environment and install required packages"""
+    user = 'telldus'
+    run('useradd -rm {}'.format(user))
+    setup_telldus()
+    create_virtualenv(user, TELLSTICKLOGGER_URL)
 
 
-    if not Path(VIRTUALENV_PATH).exists():
-        run('mkdir -p ' + VIRTUALENV_PATH)
-    run('chown {0}:{0} {1}'.format(USER, VIRTUALENV_PATH))
-
-    if not Path(PY).exists():
-        run('virtualenv -p python3 ' + VIRTUALENV_PATH + '/tellsticklogger')
-
-    run(PY + ' -m pip install ' + ' '.join(PIP_REQUIREMENTS))
+def setup_homeassistant():
+    """Create a virtual environment and install packages"""
+    user = 'homeassistant'
+    run('useradd -rm {} -G dialout,gpio'.format(user))
+    create_virtualenv(user, user)
 
 
 def deploy():
@@ -115,6 +116,9 @@ def deploy():
     run("systemctl daemon-reload")
     run("chmod +x /usr/local/bin -R")
 
+    run('{}/telldus/bin/pip --upgrade install {}'.format(VIRTUALENV_ROOT, TELLSTICKLOGGER_URL))
+    run('{}/homeassistant/bin/pip --upgrade install homeassistant'.format(VIRTUALENV_ROOT))
+
     # run('mkdir -p .plotly')
     # put('~/.plotly/.credentials', '~/.plotly/.credentials')
     # run('mkdir -p /var/lib/tellsticklogger')
@@ -124,14 +128,16 @@ def deploy():
     #      >>> tls.set_credentials_file(username='username', api_key='api-key')
 
 
-def update():
-    run(PY + ' -m pip install --upgrade ' + ' '.join(PIP_REQUIREMENTS))
+def cleanup():
+    shutil.rmtree(str(BUILD_PATH), ignore_errors=True)
 
 
 def main():
-    setup()
-    setup_telldus()
+    VIRTUALENV_ROOT.mkdir(exist_ok=True)
+    setup_tellsticklogger()
+    setup_homeassistant()
     deploy()
+    cleanup()
 
 
 if __name__ == '__main__':
