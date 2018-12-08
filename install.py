@@ -19,7 +19,7 @@ USER = getpass.getuser()
 def cd(other):
     try:
         this = os.getcwd()
-        os.chdir(other)
+        os.chdir(str(other))
         yield
     finally:
         os.chdir(this)
@@ -55,9 +55,9 @@ def setup_telldus():
     run('apt install cmake libconfuse-dev libftdi-dev help2man python3 '
          'python-virtualenv -y')
 
-    tempdir = Path('/tmp').mkdir('telldus-temp', exist_ok=True)
+    tempdir = Path('/tmp/telldus-temp').mkdir(exist_ok=True)
 
-    with cd('telldus-temp'):
+    with cd(tempdir):
         run('apt --compile source telldus-core -yq')
         #run('dpkg --install *.deb')
 
