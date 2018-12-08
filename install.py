@@ -86,6 +86,7 @@ def setup_telldus():
     assert Path('/etc/init.d/telldusd').exists()
 
 def create_virtualenv(user, packages):
+    run('apt install python3-venv -yq')
     virtualenv = VIRTUALENV_ROOT / user
     run('python3 -m venv {}'.format(virtualenv))
     run('chown -R {0}:{0} {1}'.format(user, virtualenv))
