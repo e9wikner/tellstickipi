@@ -61,6 +61,7 @@ def install_build_dependencies():
 
 def build():
     """Perform telldus-core build and install it"""
+    shutil.rmtree(str(BUILD_PATH))
     BUILD_PATH.mkdir(exist_ok=True) 
     with cd(BUILD_PATH):
         run('apt --compile source telldus-core -yq')
@@ -80,7 +81,7 @@ def setup_telldus():
     install_telldus()
     assert Path('/etc/init.d/telldusd').exists()
 
-    shutil.rmtree(builddir.name, ignore_errors=True)
+    shutil.rmtree(str(BUILD_PATH), ignore_errors=True)
 
 
 def setup():
