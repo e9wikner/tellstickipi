@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-import argparse
 from contextlib import contextmanager
 from datetime import datetime
 import getpass
@@ -35,9 +34,8 @@ def curl(url):
         return(f.read())
 
 
-def setup_telldus():
-    """ Sets up the telldus core service.
-    """
+def apt_configure_telldus_repository():
+    """Add the debian telldus source to the apt sources list."""
     telldus_source = 'deb-src http://download.telldus.com/debian/ unstable main' 
     with open('/etc/apt/sources.list.d/telldus.list', mode='w+') as f:
         lines = f.read().splitlines()
@@ -49,24 +47,36 @@ def setup_telldus():
         keyfile.write(public_key)
         run('apt-key add {}'.format(keyfile.name))
 
+
+def install_build_dependencies():
+    """Install telldus-code build dependencies"""
     run('apt update -y')
     run('apt install build-essential -y')
     run('apt build-dep telldus-core -y')
     run('apt install cmake libconfuse-dev libftdi-dev help2man python3 '
          'python-virtualenv -y')
 
+
+def build_and_install():
+    """Perform telldus-core build and install it"""
     tempdir = Path('/tmp/telldus-temp')
     tempdir.mkdir(exist_ok=True)
     with cd(tempdir):
         run('apt --compile source telldus-core -yq')
-        #run('dpkg --install *.deb')
+        run('dpkg --install *.deb')
+
+
+def setup_telldus():
+    """ Sets up the telldus core service"""
+    apt_configure_telldus_repository()
+    install_build_dependencies()
+    build_and_install()
 
     assert Path('/etc/init.d/telldusd').exists()
 
 
 def setup():
-    """ Creates a virtual environment and install required packages
-    """
+    """ Creates a virtual environment and install required packages"""
     run('apt install python3 -yq')
     telldus_daemon_init = Path('/etc/init.d/telldusd')
     if not telldus_daemon_init.exists():
@@ -87,6 +97,7 @@ def setup():
 
 
 def deploy():
+    """Deploy scripts and services"""
     backup_dir = 'backup/' + str(datetime.now().timestamp())
     os.makedirs(backup_dir)
     exclude_list = ['*.pyc', '.DS_Store', '.Apple*', '__pycache__', '.ipynb*']
@@ -102,6 +113,7 @@ def deploy():
     # TODO:
     #      >>> import plotly.tools as tls
     #      >>> tls.set_credentials_file(username='username', api_key='api-key')
+
 
 def update():
     run(PY + ' -m pip install --upgrade ' + ' '.join(PIP_REQUIREMENTS))
