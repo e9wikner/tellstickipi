@@ -98,7 +98,7 @@ def useradd(user, groups=None):
         run('useradd -rm {}'.format(user))
     except subprocess.CalledProcessError as error:
         if 9 == error.returncode:
-            print(user ' already exists')
+            print(user + ' already exists')
         else:
             raise
     if groups:
