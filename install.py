@@ -10,9 +10,10 @@ import tempfile
 from urllib import request
 
 VIRTUALENV_ROOT = Path('/usr/lib/virtualenv')
-TELLSTICKLOGGER_URL = ('git+https://github.com/e9wikner/tellsticklogger.git',)
+TELLSTICKLOGGER_URL = 'git+https://github.com/e9wikner/tellsticklogger.git'
 BUILD_PATH = Path('/tmp/telldus-temp')
 TELLDUS_DAEMON_INIT = Path('/etc/init.d/telldusd')
+SERVICES = 'tellstick_sensorlog homeassistant@home-assistant'
 USER = getpass.getuser()
 
 
@@ -129,6 +130,12 @@ def deploy():
     #      >>> tls.set_credentials_file(username='username', api_key='api-key')
 
 
+def start():
+    """Startup tellsticklogger and homeassistant"""
+    run("systemctl restart " + SERVICES)
+    run("systemctl enable " + SERVICES)
+
+
 def cleanup():
     shutil.rmtree(str(BUILD_PATH), ignore_errors=True)
 
@@ -138,6 +145,8 @@ def main():
     setup_tellsticklogger()
     setup_homeassistant()
     deploy()
+    start()
+    print('Visit homeassistant at localhost:8123')
     cleanup()
 
 
