@@ -129,8 +129,8 @@ def deploy():
     run("systemctl daemon-reload")
     run("chmod +x /usr/local/bin -R")
 
-    run('{}/telldus/bin/pip --upgrade install {}'.format(VIRTUALENV_ROOT, TELLSTICKLOGGER_URL))
-    run('{}/homeassistant/bin/pip --upgrade install homeassistant'.format(VIRTUALENV_ROOT))
+    run('{}/telldus/bin/pip install --upgrade {}'.format(VIRTUALENV_ROOT, TELLSTICKLOGGER_URL))
+    run('{}/homeassistant/bin/pip install --upgrade homeassistant'.format(VIRTUALENV_ROOT))
 
     # run('mkdir -p .plotly')
     # put('~/.plotly/.credentials', '~/.plotly/.credentials')
