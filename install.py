@@ -2,6 +2,7 @@
 import argparse
 from contextlib import contextmanager
 from datetime import datetime
+from functools import wraps
 import getpass
 import os
 from pathlib import Path
@@ -13,6 +14,9 @@ VIRTUALENV_PATH = '/usr/lib/virtualenv'
 PIP_REQUIREMENTS = ('git+https://github.com/e9wikner/tellsticklogger.git',)
 PY = VIRTUALENV_PATH + '/tellsticklogger/bin/python'
 USER = getpass.getuser()
+TASKS = []
+TASKS_DOCS = dict()
+TASKS_FUNC = dict()
 
 
 @contextmanager
@@ -25,6 +29,13 @@ def cd(other):
         os.chdir(this)
 
 
+def task(decorated_function):
+    TASKS.append(decorated_function)
+    TASKS_DOCS[decorated_function.__name__] = decorated_function.__doc__
+    TASKS_FUNC[decorated_function.__name__] = decorated_function
+    return decorated_function
+
+
 def run(commandstring):
     print(commandstring)
     subprocess.check_call(commandstring.split())
@@ -35,9 +46,9 @@ def curl(url):
         return(f.read())
 
 
-def setup_telldus():
-    """ Sets up the telldus core service.
-    """
+@task
+def apt_configure_telldus_repository():
+    """Add the debian telldus source to the apt sources list."""
     telldus_source = 'deb-src http://download.telldus.com/debian/ unstable main' 
     with open('/etc/apt/sources.list.d/telldus.list', mode='w+') as f:
         lines = f.read().splitlines()
@@ -49,24 +60,40 @@ def setup_telldus():
         keyfile.write(public_key)
         run('apt-key add {}'.format(keyfile.name))
 
+
+@task
+def install_build_dependencies():
+    """Install telldus-code build dependencies"""
     run('apt update -y')
     run('apt install build-essential -y')
     run('apt build-dep telldus-core -y')
     run('apt install cmake libconfuse-dev libftdi-dev help2man python3 '
          'python-virtualenv -y')
 
+
+@task
+def build_and_install():
+    """Perform telldus-core build and install it"""
     tempdir = Path('/tmp/telldus-temp')
     tempdir.mkdir(exist_ok=True)
     with cd(tempdir):
         run('apt --compile source telldus-core -yq')
-        #run('dpkg --install *.deb')
+        run('dpkg --install *.deb')
+
+
+@task
+def setup_telldus():
+    """ Sets up the telldus core service"""
+    apt_configure_telldus_repository()
+    install_build_dependencies()
+    build_and_install()
 
     assert Path('/etc/init.d/telldusd').exists()
 
 
+@task
 def setup():
-    """ Creates a virtual environment and install required packages
-    """
+    """ Creates a virtual environment and install required packages"""
     run('apt install python3 -yq')
     telldus_daemon_init = Path('/etc/init.d/telldusd')
     if not telldus_daemon_init.exists():
@@ -86,7 +113,9 @@ def setup():
     run(PY + ' -m pip install ' + ' '.join(PIP_REQUIREMENTS))
 
 
+@task
 def deploy():
+    """Deploy scripts and services"""
     backup_dir = 'backup/' + str(datetime.now().timestamp())
     os.makedirs(backup_dir)
     exclude_list = ['*.pyc', '.DS_Store', '.Apple*', '__pycache__', '.ipynb*']
@@ -103,14 +132,27 @@ def deploy():
     #      >>> import plotly.tools as tls
     #      >>> tls.set_credentials_file(username='username', api_key='api-key')
 
+
+@task
 def update():
     run(PY + ' -m pip install --upgrade ' + ' '.join(PIP_REQUIREMENTS))
 
 
+def get_arguments_parser():
+    parser = argparse.ArgumentParser()
+    for task in TASKS:
+        parser.add_argument('--' + task.__name__, help=task.__doc__, action='store_true')
+    return parser
+
+
 def main():
-    setup()
-    setup_telldus()
-    deploy()
+    parser = get_arguments_parser()
+    parser.parse_args()
+    import pdb; pdb.set_trace()
+    selected_tasks = [arg.lstrip('-')]
+    # setup()
+    # setup_telldus()
+    # deploy()
 
 
 if __name__ == '__main__':
