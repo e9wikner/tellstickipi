@@ -16,7 +16,7 @@ TELLSTICK_LOG_DIR = Path('/var/lib/tellsticklogger')
 BUILD_PATH = Path('/tmp/telldus-temp')
 TELLDUS_DAEMON_INIT = Path('/etc/init.d/telldusd')
 SERVICES = 'tellstick_sensorlog homeassistant@homeassistant notify_reboot.timer'
-BACKUP_DIR = 'backup/' + str(datetime.now().isoformat()).replace(':', '')
+BACKUP_DIR = 'backup/' + str(datetime.now().isoformat()).replace(':', '-')
 
 
 @contextmanager
@@ -191,7 +191,7 @@ def deploy():
 
 def start():
     """Startup tellsticklogger and homeassistant"""
-    shutil.chown(TELLSTICK_LOG_DIR, user='telldus', group='telldus')
+    shutil.chown(str(TELLSTICK_LOG_DIR), user='telldus', group='telldus')
     run("systemctl start " + SERVICES)
     run("systemctl enable " + SERVICES)
 
