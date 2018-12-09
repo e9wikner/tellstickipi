@@ -4,6 +4,7 @@ from datetime import datetime
 import getpass
 import os
 from pathlib import Path
+import re
 import shutil
 import subprocess
 import tempfile
@@ -11,10 +12,11 @@ from urllib import request
 
 VIRTUALENV_ROOT = Path('/usr/lib/virtualenv')
 TELLSTICKLOGGER_URL = 'git+https://github.com/e9wikner/tellsticklogger.git'
+TELLSTICK_LOG_DIR = Path('/var/lib/tellsticklogger')
 BUILD_PATH = Path('/tmp/telldus-temp')
 TELLDUS_DAEMON_INIT = Path('/etc/init.d/telldusd')
-SERVICES = 'tellstick_sensorlog homeassistant@homeassistant'
-USER = getpass.getuser()
+SERVICES = 'tellstick_sensorlog homeassistant@homeassistant notify_reboot.timer'
+BACKUP_DIR = 'backup/' + str(datetime.now().isoformat()).replace(':', '')
 
 
 @contextmanager
@@ -35,6 +37,52 @@ def run(commandstring):
 def curl(url):
     with request.urlopen(url) as f:
         return(f.read())
+
+
+# TODO: not tested, remove if not needed later
+def uncomment(*, filename, regex, backup_dir=BACKUP_DIR):
+    pattern = re.compile(regex)
+
+    with open(filename) as inputfile:
+        inputtext= inputfile.read()
+
+    backupfile = Path(backup_dir) / filename.lstrip('/')
+    backupfile.write_text(inputtext)
+    print('Backup: {} --> {}'.format(filename, backup_file))
+
+    def yield_uncommented_lines():
+        for line in inputtext.splitlines():
+            beginning, _, end = line.partition('#')
+            if '' == beginning.strip() and pattern.search(end):
+                yield beginning + end
+            else:
+                yield line
+
+    print('Uncomment {} with regex {}'.format(filename, regex))
+    newfile = Path(filename)
+    newfile.write_text('\n'.join(yield_uncommented_lines()))
+
+
+def setup_notifications():
+    run('apt install ssmtp mailutils -yq')
+    email_to = input('Email address that should receive notifications: ')
+    email_from = input('Email address that should send notifications: ')
+    mailhub = input('Email host? e.g. smtp.gmail.com:587: ')
+    username = input('Email username:')
+    password = getpass.getpass()
+
+    ssmtp_conf = (
+        "root=" + email_from,
+        "mailhub=" + mailhub,
+        # "rewriteDomain=" + 
+        "hostname=localhost.localdomain",
+        "UseTLS=Yes",
+        "UseSTARTTLS=Yes",
+        "AuthUser=" + username,
+        "AuthPass=" + password)
+
+    Path('/etc/ssmtp/ssmtp.conf').write_text('\n'.join(ssmtp_conf))
+    Path('/etc/systemd/system/notify.conf').write_text('NOTIFY_EMAIL=' + email_to)
 
 
 def apt_configure_telldus_repository():
@@ -61,7 +109,7 @@ def install_build_dependencies():
 
 def build_telldus():
     """Perform telldus-core build and install it"""
-    shutil.rmtree(str(BUILD_PATH))
+    shutil.rmtree(str(BUILD_PATH), ignore_errors=True)
     BUILD_PATH.mkdir(exist_ok=True) 
     with cd(BUILD_PATH):
         run('apt --compile source telldus-core -yq')
@@ -86,6 +134,7 @@ def setup_telldus():
     install_telldus()
     assert Path('/etc/init.d/telldusd').exists()
 
+
 def create_virtualenv(user, packages):
     run('apt install python3-venv -yq')
     virtualenv = VIRTUALENV_ROOT / user
@@ -104,10 +153,11 @@ def useradd(user, groups=None):
     if groups:
         run('usermod --groups {} {}'.format(groups, user))
 
+
 def setup_tellsticklogger():
     """ Create a virtual environment and install required packages"""
     user = 'telldus'
-    # run('useradd -rm {}'.format(user))
+    run('useradd -rm {}'.format(user))
     setup_telldus()
     create_virtualenv(user, TELLSTICKLOGGER_URL)
 
@@ -122,11 +172,8 @@ def setup_homeassistant():
 
 def deploy():
     """Deploy scripts and services"""
-    backup_dir = 'backup/' + str(datetime.now().timestamp())
-    os.makedirs(backup_dir)
-    exclude_list = ['*.pyc', '.DS_Store', '.Apple*', '__pycache__', '.ipynb*']
     run('rsync --checksum --recursive -hv src/ / --backup-dir {}'.format(backup_dir))
-    run("mkdir -p /var/lib/tellsticklogger")
+    TELLSTICK_LOG_DIR.mkdir(exist_ok=True) 
     run("systemctl daemon-reload")
     run("chmod +x /usr/local/bin -R")
 
@@ -144,6 +191,7 @@ def deploy():
 
 def start():
     """Startup tellsticklogger and homeassistant"""
+    shutil.chown(TELLSTICK_LOG_DIR, user='telldus', group='telldus')
     run("systemctl start " + SERVICES)
     run("systemctl enable " + SERVICES)
 
@@ -153,13 +201,14 @@ def cleanup():
 
 
 def main():
+    os.makedirs(BACKUP_DIR)
     VIRTUALENV_ROOT.mkdir(exist_ok=True)
+    setup_notifications()
     setup_tellsticklogger()
     setup_homeassistant()
     deploy()
     start()
     print('Setup is finished and homeassistant is launching at localhost:8123')
-
     cleanup()
 
 
