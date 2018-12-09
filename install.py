@@ -172,7 +172,7 @@ def setup_homeassistant():
 
 def deploy():
     """Deploy scripts and services"""
-    run('rsync --checksum --recursive -hv src/ / --backup-dir {}'.format(backup_dir))
+    run('rsync --checksum --recursive -hv src/ / --backup-dir {}'.format(BACKUP_DIR))
     TELLSTICK_LOG_DIR.mkdir(exist_ok=True) 
     run("systemctl daemon-reload")
     run("chmod +x /usr/local/bin -R")
