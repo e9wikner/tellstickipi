@@ -4,7 +4,7 @@ OnFailure=notify_service_status@%n.service
 
 [Service]
 Type=simple
-ExecStart=/usr/lib/virtualenv/tellsticklogger/bin/tellstick_logger --csvpath /var/lib/tellsticklogger
+ExecStart=/usr/lib/virtualenv/telldus/bin/tellstick_logger --csvpath /var/lib/tellsticklogger
 
 [Install]
 WantedBy=multi-user.target

@@ -15,7 +15,7 @@ TELLSTICKLOGGER_URL = 'git+https://github.com/e9wikner/tellsticklogger.git'
 TELLSTICK_LOG_DIR = Path('/var/lib/tellsticklogger')
 BUILD_PATH = Path('/tmp/telldus-temp')
 TELLDUS_DAEMON_INIT = Path('/etc/init.d/telldusd')
-SERVICES = 'tellstick_sensorlog homeassistant@homeassistant notify_reboot.timer'
+SERVICES = 'tellstick_sensorlog tellstick_sensorlog_is_alive.timer homeassistant notify_reboot.timer'
 BACKUP_DIR = 'backup/' + str(datetime.now().isoformat()).replace(':', '-')
 
 
@@ -66,23 +66,24 @@ def uncomment(*, filename, regex, backup_dir=BACKUP_DIR):
 def setup_notifications():
     run('apt install ssmtp mailutils -yq')
     email_to = input('Email address that should receive notifications: ')
-    email_from = input('Email address that should send notifications: ')
-    mailhub = input('Email host? e.g. smtp.gmail.com:587: ')
-    username = input('Email username:')
-    password = getpass.getpass()
+    # email_from = input('Email address that should send notifications: ')
+    # mailhub = input('Email host? e.g. smtp.gmail.com:587: ')
+    # username = input('Email username:')
+    # password = getpass.getpass()
 
-    ssmtp_conf = (
-        "root=" + email_from,
-        "mailhub=" + mailhub,
-        # "rewriteDomain=" + 
-        "hostname=localhost.localdomain",
-        "UseTLS=Yes",
-        "UseSTARTTLS=Yes",
-        "AuthUser=" + username,
-        "AuthPass=" + password)
+    # ssmtp_conf = (
+    #     "root=" + email_from,
+    #     "mailhub=" + mailhub,
+    #     # "rewriteDomain=" + 
+    #     "hostname=localhost.localdomain",
+    #     "UseTLS=Yes",
+    #     "UseSTARTTLS=Yes",
+    #     "AuthUser=" + username,
+    #     "AuthPass=" + password)
 
-    Path('/etc/ssmtp/ssmtp.conf').write_text('\n'.join(ssmtp_conf))
+    # Path('/etc/ssmtp/ssmtp.conf').write_text('\n'.join(ssmtp_conf))
     Path('/etc/systemd/system/notify.conf').write_text('NOTIFY_EMAIL=' + email_to)
+    print('Edit `/etc/ssmtp/ssmtp.conf` to configure').write_text('\n'.join(ssmtp_conf))
 
 
 def apt_configure_telldus_repository():
