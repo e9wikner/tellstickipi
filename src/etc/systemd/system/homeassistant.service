@@ -4,7 +4,7 @@ After=network.target
 
 [Service]
 Type=simple
-User=%i
+User=homeassistant
 ExecStart=/usr/lib/virtualenv/homeassistant/bin/hass
 
 [Install]

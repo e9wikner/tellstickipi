@@ -66,24 +66,11 @@ def uncomment(*, filename, regex, backup_dir=BACKUP_DIR):
 def setup_notifications():
     run('apt install ssmtp mailutils -yq')
     email_to = input('Email address that should receive notifications: ')
-    # email_from = input('Email address that should send notifications: ')
-    # mailhub = input('Email host? e.g. smtp.gmail.com:587: ')
-    # username = input('Email username:')
-    # password = getpass.getpass()
-
-    # ssmtp_conf = (
-    #     "root=" + email_from,
-    #     "mailhub=" + mailhub,
-    #     # "rewriteDomain=" + 
-    #     "hostname=localhost.localdomain",
-    #     "UseTLS=Yes",
-    #     "UseSTARTTLS=Yes",
-    #     "AuthUser=" + username,
-    #     "AuthPass=" + password)
-
-    # Path('/etc/ssmtp/ssmtp.conf').write_text('\n'.join(ssmtp_conf))
     Path('/etc/systemd/system/notify.conf').write_text('NOTIFY_EMAIL=' + email_to)
-    print('Edit `/etc/ssmtp/ssmtp.conf` to configure').write_text('\n'.join(ssmtp_conf))
+
+    print('Edit `/etc/ssmtp/ssmtp.conf` to configure notifications')
+    print('Restart your Pi or run `systemctl restart notify_reboot` and you '
+          'should get an email notification about reboot.')
 
 
 def apt_configure_telldus_repository():
