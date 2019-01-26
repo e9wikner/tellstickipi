@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-from contextlib import contextmanager
 from datetime import datetime
 import getpass
 import os
@@ -10,6 +9,9 @@ import subprocess
 import tempfile
 from urllib import request
 
+from utils import *
+
+
 VIRTUALENV_ROOT = Path('/usr/lib/virtualenv')
 TELLSTICKLOGGER_URL = 'git+https://github.com/e9wikner/tellsticklogger.git'
 TELLSTICK_LOG_DIR = Path('/var/lib/tellsticklogger')
@@ -17,50 +19,6 @@ BUILD_PATH = Path('/tmp/telldus-temp')
 TELLDUS_DAEMON_INIT = Path('/etc/init.d/telldusd')
 SERVICES = 'tellstick_sensorlog tellstick_sensorlog_is_alive.timer homeassistant notify_reboot.timer'
 BACKUP_DIR = 'backup/' + str(datetime.now().isoformat()).replace(':', '-')
-
-
-@contextmanager
-def cd(other):
-    try:
-        this = os.getcwd()
-        os.chdir(str(other))
-        yield
-    finally:
-        os.chdir(this)
-
-
-def run(commandstring):
-    print(commandstring)
-    subprocess.check_call(commandstring.split())
- 
-
-def curl(url):
-    with request.urlopen(url) as f:
-        return(f.read())
-
-
-# TODO: not tested, remove if not needed later
-def uncomment(*, filename, regex, backup_dir=BACKUP_DIR):
-    pattern = re.compile(regex)
-
-    with open(filename) as inputfile:
-        inputtext= inputfile.read()
-
-    backupfile = Path(backup_dir) / filename.lstrip('/')
-    backupfile.write_text(inputtext)
-    print('Backup: {} --> {}'.format(filename, backup_file))
-
-    def yield_uncommented_lines():
-        for line in inputtext.splitlines():
-            beginning, _, end = line.partition('#')
-            if '' == beginning.strip() and pattern.search(end):
-                yield beginning + end
-            else:
-                yield line
-
-    print('Uncomment {} with regex {}'.format(filename, regex))
-    newfile = Path(filename)
-    newfile.write_text('\n'.join(yield_uncommented_lines()))
 
 
 def setup_notifications():
