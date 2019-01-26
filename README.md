@@ -20,6 +20,12 @@
 
 ## Upgrade
 
+When the system is installed it needs to be upgraded. Use `sudo python3 upgrade.py --help`
+to get more info on the options. The script will upgrade the system as well as the installed
+packages if you don't specify any options.
+
+## Upgrade to a new Pi or a clean install
+
 The upgrade process is not entirely verified but after you have installed the new Pi
 here are the steps that you should take.
 
