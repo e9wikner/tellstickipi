@@ -33,8 +33,6 @@ def apt_configure_telldus_repository():
         keyfile.write(public_key)
         run("apt-key add {}".format(keyfile.name))
 
-    run("apt update")
-
 
 def install_build_dependencies():
     """Install telldus-code build dependencies"""
