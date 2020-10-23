@@ -7,7 +7,6 @@ import re
 import shutil
 import subprocess
 import tempfile
-from urllib import request
 
 from utils import *
 

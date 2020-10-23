@@ -2,6 +2,7 @@
 from contextlib import contextmanager
 import os
 import subprocess
+from urllib import request
 
 
 @contextmanager
@@ -17,8 +18,8 @@ def cd(other):
 def run(commandstring):
     print(commandstring)
     subprocess.check_call(commandstring.split())
- 
+
 
 def curl(url):
     with request.urlopen(url) as f:
-        return(f.read())
+        return f.read()
