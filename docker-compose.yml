@@ -1,0 +1,16 @@
+version: "3"
+services:
+    homeassistant:
+        container_name: home-assistant
+        image: homeassistant/raspberrypi4-homeassistant:stable
+        volumes:
+            - /home/e9wikner/homeassistant_config/:/config
+            - /home/e9wikner/tellstick.conf:/etc/tellstick.conf
+        devices:
+            - /dev/ttyUSB0:/dev/ttyUSB0
+            - /dev/ttyUSB1:/dev/ttyUSB1
+            - /dev/ttyACM0:/dev/ttyACM0
+        environment:
+            - TZ=Europe/Stockholm
+        restart: always
+        network_mode: host
