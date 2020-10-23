@@ -17,20 +17,8 @@ TELLSTICKLOGGER_URL = "git+https://github.com/e9wikner/tellsticklogger.git"
 TELLSTICK_LOG_DIR = Path("/var/lib/tellsticklogger")
 BUILD_PATH = Path("/tmp/telldus-temp")
 TELLDUS_DAEMON_INIT = Path("/etc/init.d/telldusd")
-SERVICES = "tellstick_sensorlog tellstick_sensorlog_is_alive.timer homeassistant notify_reboot.timer"
+SERVICES = "tellstick_sensorlog "
 BACKUP_DIR = "backup/" + str(datetime.now().isoformat()).replace(":", "-")
-
-
-def setup_notifications():
-    run("apt install ssmtp mailutils -yq")
-    email_to = input("Email address that should receive notifications: ")
-    Path("/etc/systemd/system/notify.conf").write_text("NOTIFY_EMAIL=" + email_to)
-
-    print("Edit `/etc/ssmtp/ssmtp.conf` to configure notifications")
-    print(
-        "Restart your Pi or run `systemctl restart notify_reboot` and you "
-        "should get an email notification about reboot."
-    )
 
 
 def apt_configure_telldus_repository():
@@ -66,7 +54,7 @@ def setup_telldus():
     assert Path("/etc/init.d/telldusd").exists()
 
 
-def create_virtualenv(user, packages):
+def create_virtualenv(user):
     run("apt install python3-venv -yq")
     virtualenv = VIRTUALENV_ROOT / user
     run("python3 -m venv {}".format(virtualenv))
@@ -90,7 +78,7 @@ def setup_tellsticklogger():
     user = "telldus"
     run("useradd -rm {}".format(user))
     setup_telldus()
-    create_virtualenv(user, TELLSTICKLOGGER_URL)
+    create_virtualenv(user)
 
 
 def setup_homeassistant():
@@ -102,7 +90,6 @@ def setup_homeassistant():
 
 def deploy():
     """Deploy scripts and services"""
-    run("chmod +x usr/local/bin -R")
     run("rsync --checksum --recursive -hv src/ / --backup-dir {}".format(BACKUP_DIR))
     TELLSTICK_LOG_DIR.mkdir(exist_ok=True)
     run("systemctl daemon-reload")
@@ -131,7 +118,6 @@ def start():
 
 def main():
     os.makedirs(BACKUP_DIR)
-    setup_notifications()
     setup_tellsticklogger()
     setup_homeassistant()
     deploy()
