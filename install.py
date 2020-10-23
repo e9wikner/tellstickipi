@@ -37,7 +37,7 @@ def apt_configure_telldus_repository():
 
 
 def install_telldus():
-    run("apt install telldusd")
+    run("apt install telldus-core")
 
 
 def setup_telldus():
