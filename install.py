@@ -75,7 +75,7 @@ def useradd(user, groups=None):
 def setup_tellsticklogger():
     """ Create a virtual environment and install required packages"""
     user = "telldus"
-    run("useradd -rm {}".format(user))
+    useradd(user)
     setup_telldus()
     create_virtualenv(user)
 
