@@ -22,8 +22,8 @@ BACKUP_DIR = "backup/" + str(datetime.now().isoformat()).replace(":", "-")
 
 def apt_configure_telldus_repository():
     """Add the debian telldus source to the apt sources list."""
-    telldus_source = "deb http://download.telldus.com/debian/ stable main"
-    with open("/etc/apt/sources.list", mode="w+") as f:
+    telldus_source = "deb-src http://download.telldus.com/debian/ unstable main"
+    with open("/etc/apt/sources.list.d/telldus.list", mode="w+") as f:
         lines = f.read().splitlines()
         if not telldus_source in lines:
             f.write(telldus_source)
@@ -36,8 +36,25 @@ def apt_configure_telldus_repository():
     run("apt update")
 
 
+def install_build_dependencies():
+    """Install telldus-code build dependencies"""
+    run("apt update -y")
+    run("apt install build-essential -y")
+    run("apt build-dep telldus-core -y")
+    run("apt install cmake libconfuse-dev libftdi-dev help2man python3 -y")
+
+
+def build_telldus():
+    """Perform telldus-core build and install it"""
+    shutil.rmtree(str(BUILD_PATH), ignore_errors=True)
+    BUILD_PATH.mkdir(exist_ok=True)
+    with cd(BUILD_PATH):
+        run("apt --compile source telldus-core -yq")
+
+
 def install_telldus():
-    run("apt install telldus-core")
+    deb_packages = " ".join((str(p) for p in BUILD_PATH.glob("*.deb")))
+    run("dpkg --install {}".format(deb_packages))
 
 
 def setup_telldus():
@@ -47,8 +64,10 @@ def setup_telldus():
             "Skip telldus install since {} already exists".format(TELLDUS_DAEMON_INIT)
         )
         return
-
     apt_configure_telldus_repository()
+    install_build_dependencies()
+
+    build_telldus()
     install_telldus()
     assert Path("/etc/init.d/telldusd").exists()
 
