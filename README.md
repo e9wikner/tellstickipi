@@ -18,6 +18,11 @@
   the entire install script you can run certain steps like this: 
   `sudo python3 -c "import install; install.deploy(); install.start()"`
 
+- Create link to syncthing root:
+  `sudo ln -s /srv/dev-disk-by-label-external/ syncthing_volume`
+
+- Launch:
+  `SYNCTHING_USER=$(id -u):$(id -g) docker-compose up`
 ## Upgrade
 
 When the system is installed it needs to be upgraded. Use `sudo python3 upgrade.py --help`

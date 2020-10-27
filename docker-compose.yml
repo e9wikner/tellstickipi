@@ -7,10 +7,15 @@ services:
             - /home/e9wikner/homeassistant_config/:/config
             - /home/e9wikner/tellstick.conf:/etc/tellstick.conf
         devices:
-            - /dev/ttyUSB0:/dev/ttyUSB0
-            - /dev/ttyUSB1:/dev/ttyUSB1
-            - /dev/ttyACM0:/dev/ttyACM0
+            - /dev/bus/usb:/dev/bus/usb
         environment:
             - TZ=Europe/Stockholm
         restart: always
         network_mode: host
+    syncthing:
+        image: syncthing/syncthing:latest
+        user: ${SYNCTHING_USER}
+        network_mode: host
+        restart: always
+        volumes:
+            - /home/e9wikner/syncthing_volume:/var/syncthing
