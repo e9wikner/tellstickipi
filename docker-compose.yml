@@ -1,13 +1,16 @@
 version: "3"
 services:
-    homeassistant:
+    home-assistant:
         container_name: home-assistant
         image: homeassistant/raspberrypi4-homeassistant:stable
         volumes:
             - ${HOME}/homeassistant_config/:/config
             - /etc/tellstick.conf:/etc/tellstick.conf
+            - /tmp/TelldusClient:/tmp/TelldusClient
+            - /tmp/TelldusEvents:/tmp/TelldusEvents
         devices:
             - /dev/bus/usb:/dev/bus/usb
+        privileged: true
         environment:
             - TZ=Europe/Stockholm
         restart: always
