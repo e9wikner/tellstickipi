@@ -97,13 +97,6 @@ def setup_tellsticklogger():
     create_virtualenv(user)
 
 
-def setup_homeassistant():
-    """Launch docker container"""
-    user = "homeassistant"
-    # useradd(user, groups='dialout,gpio')
-    run("docker-compose up -d --build")
-
-
 def deploy():
     """Deploy scripts and services"""
     run("rsync --checksum --recursive -hv src/ / --backup-dir {}".format(BACKUP_DIR))
@@ -135,10 +128,9 @@ def start():
 def main():
     os.makedirs(BACKUP_DIR)
     setup_tellsticklogger()
-    setup_homeassistant()
     deploy()
     start()
-    print("Setup is finished and homeassistant is launching at localhost:8123")
+    print("Setup is finished")
 
 
 if __name__ == "__main__":
