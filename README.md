@@ -1,5 +1,7 @@
 # tellstickipi
 
+Raspberry Pi 4 with home-assistant, syncthing, tellstick logging and foggy sync.
+
 ## Installation
 
 - Install Raspbian according to https://www.raspberrypi.org/documentation/installation/
@@ -22,7 +24,8 @@
   `sudo ln -s /srv/dev-disk-by-label-external/ syncthing_volume`
 
 - Launch:
-  `SYNCTHING_USER=$(id -u):$(id -g) docker-compose up`
+  `USERID=$(id -u):$(id -g) docker-compose up -d`
+
 ## Upgrade
 
 When the system is installed it needs to be upgraded. Use `sudo python3 upgrade.py --help`
@@ -34,9 +37,8 @@ packages if you don't specify any options.
 The upgrade process is not entirely verified but after you have installed the new Pi
 here are the steps that you should take.
 
-- Copy the configurations from the previos Pi to the new Pi:
+- Copy the configurations from the previus Pi to the new Pi:
     - `/home/homeassistant/.homeassistant/*.yaml`
-    - `/etc/ssmtp/ssmtp.conf`
     - `/etc/tellstick.conf`
 
 - Restart the services:
