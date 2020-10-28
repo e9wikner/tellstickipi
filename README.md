@@ -1,6 +1,6 @@
 # tellstickipi
 
-Raspberry Pi 4 with home-assistant, syncthing, tellstick logging and foggy sync.
+Raspberry Pi 4 with openmediavault, home-assistant, syncthing, tellstick logging and foggy sync.
 
 ## Installation
 
@@ -20,11 +20,23 @@ Raspberry Pi 4 with home-assistant, syncthing, tellstick logging and foggy sync.
   the entire install script you can run certain steps like this: 
   `sudo python3 -c "import install; install.deploy(); install.start()"`
 
+- Install OpenMediaVault:
+  `wget -O - https://github.com/OpenMediaVault-Plugin-Developers/installScript/raw/master/install | sudo bash`
+
+- Configure OpenMediaVault and install docker from the web interface
+  - Add your users
+  - Disable the pi account and add your own admin account
+  - Install plugins
+  - Mount external filesystem
+
 - Create link to syncthing root:
   `sudo ln -s /srv/dev-disk-by-label-external/ syncthing_volume`
 
 - Launch:
   `USERID=$(id -u):$(id -g) docker-compose up -d`
+
+- Backup:
+  `git clone https://github.com/billw2/rpi-clone.git`
 
 ## Upgrade
 
