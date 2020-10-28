@@ -103,11 +103,8 @@ def deploy():
     TELLSTICK_LOG_DIR.mkdir(exist_ok=True)
     run("systemctl daemon-reload")
 
-    run(
-        "{}/telldus/bin/pip install --upgrade {}".format(
-            VIRTUALENV_ROOT, TELLSTICKLOGGER_URL
-        )
-    )
+    run(f"{VIRTUALENV_ROOT}/telldus/bin/pip install wheel")
+    run(f"{VIRTUALENV_ROOT}/telldus/bin/pip install --upgrade {TELLSTICKLOGGER_URL}")
 
     # run('mkdir -p .plotly')
     # put('~/.plotly/.credentials', '~/.plotly/.credentials')
