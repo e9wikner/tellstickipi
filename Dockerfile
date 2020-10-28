@@ -1,25 +1,43 @@
-FROM debian:stretch-slim
+FROM homeassistant/raspberrypi4-homeassistant:stable
 
-RUN apt-get update && apt-get upgrade -y
+ENV LANG C.UTF-8
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    ca-certificates \
-    gnupg \
-    wget
-
-RUN echo "deb http://download.telldus.com/debian/ stable main" > /etc/apt/sources.list.d/telldus.list && \
-    wget -q http://download.telldus.com/debian/telldus-public.key -O- | apt-key add -
-
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    libconfuse-common \
-    libconfuse1 \
+# Install Telldus library for TellStick (using same approach as in hassio docker installation)
+RUN apk add --no-cache \
+    confuse \
     libftdi1 \
-    libtelldus-core2
+    libstdc++ \
+    socat \
+    && apk add --no-cache --virtual .build-dependencies \
+    argp-standalone \
+    build-base \
+    cmake \
+    confuse-dev \
+    doxygen \
+    gcc \
+    git \
+    libftdi1-dev \
+    && ln -s /usr/include/libftdi1/ftdi.h /usr/include/ftdi.h \
+    && mkdir -p /usr/src \
+    && cd /usr/src \
+    && git clone -b master --depth 1 https://github.com/telldus/telldus \
+    && cd telldus/telldus-core \
+    && sed -i \
+    "/\<sys\/socket.h\>/a \#include \<sys\/select.h\>" \
+    common/Socket_unix.cpp \
+    && cmake . \
+    -DBUILD_LIBTELLDUS-CORE=ON \
+    -DBUILD_TDADMIN=OFF \
+    -DBUILD_TDTOOL=ON \
+    -DGENERATE_MAN=OFF \
+    -DFORCE_COMPILE_FROM_TRUNK=ON \
+    -DFTDI_LIBRARY=/usr/lib/libftdi1.so \
+    && make \
+    && make install \
+    && apk del .build-dependencies \
+    && rm -rf /usr/src/telldus
 
-RUN apt-get download telldus-core && \
-    dpkg --ignore-depends=libconfuse0 -i telldus-core_2.1.2-1_armhf.deb && \
-    sed -i 's/\(Depends:.*\)libconfuse0[^,]*/\1libconfuse1 (>= 3.0)/' /var/lib/dpkg/status && \
-    ln -s /usr/lib/arm-linux-gnueabihf/libconfuse.so.1 /usr/lib/arm-linux-gnueabihf/libconfuse.so.0 && \
-    apt-get --fix-broken install -y
+# Copy data for add-on
+COPY data/run.sh /
 
-ENTRYPOINT ["/usr/sbin/telldusd", "--nodaemon"]
+CMD [ "/run.sh" ]
