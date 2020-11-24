@@ -28,7 +28,6 @@ services:
         image: ghcr.io/linuxserver/plex
         environment:
             - TZ=Europe/Stockholm
-            - PGID=100
             - VERSION=docker
         network_mode: host
         restart : unless-stopped
