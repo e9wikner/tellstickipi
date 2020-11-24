@@ -34,5 +34,6 @@ services:
         volumes:
             - ${HOME}/plex/config:/config \
             - ${HOME}/plex/var/transcode:/transcode \
-            - ${HOME}/plex/data:/data 
+            - ${HOME}/plex/movies:/movies
+            - ${HOME}/plex/tv:/tv
         user: ${USERID}
