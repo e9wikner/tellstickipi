@@ -25,15 +25,13 @@ services:
             - ${HOME}/syncthing_volume:/var/syncthing
     plex:
         container_name: plex
-        image: plexinc/pms-docker
+        image: ghcr.io/linuxserver/plex
         environment:
             - TZ=Europe/Stockholm
-            - PLEX_CLAIM="<claimToken>"
-        logging:
-            driver: journald
-            options:
-                tag: "plex"
+            - PGID=100
+            - VERSION=docker
         network_mode: host
+        restart : unless-stopped
         volumes:
             - ${HOME}/plex/config:/config \
             - ${HOME}/plex/var/transcode:/transcode \
