@@ -36,4 +36,3 @@ services:
             - ${HOME}/plex/var/transcode:/transcode \
             - ${HOME}/plex/movies:/movies
             - ${HOME}/plex/tv:/tv
-        user: ${USERID}
