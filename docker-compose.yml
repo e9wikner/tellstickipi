@@ -23,16 +23,3 @@ services:
         restart: always
         volumes:
             - ${HOME}/syncthing_volume:/var/syncthing
-    foggy:
-        container_name: foggy
-        image: e9wikner/foggy:latest
-        logging:
-            driver: journald
-            options:
-                tag: "foggy"
-        ports:
-            - 21210:21210
-        volumes:
-            - /etc/avahi/services/:/etc/avahi/services/
-            - ${HOME}/syncthing_volume/folders/stefans/pictures:/pictures
-        user: ${USERID}
