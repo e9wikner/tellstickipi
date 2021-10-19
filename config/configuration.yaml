@@ -2,6 +2,19 @@
 # Configure a default setup of Home Assistant (frontend, api, etc)
 default_config:
 
+sensor:
+  - platform: tellstick
+    #  116: kallvind
+    #  226: krypgrund
+    #  240: utomhu
+
+# Tellstick base component
+tellstick:
+  signal_repetitions: 2
+
+switch:
+  - platform: tellstick
+
 # Text to speech
 tts:
   - platform: google_translate
