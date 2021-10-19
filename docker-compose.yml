@@ -15,11 +15,3 @@ services:
             - TZ=Europe/Stockholm
         restart: always
         network_mode: host
-    syncthing:
-        container_name: syncthing
-        image: syncthing/syncthing:latest
-        user: ${USERID}
-        network_mode: host
-        restart: always
-        volumes:
-            - ${HOME}/syncthing_volume:/var/syncthing
