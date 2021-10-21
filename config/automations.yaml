@@ -1,1 +1,104 @@
-[]
+- id: '1634837623480'
+  alias: Tänd på morgonen
+  description: ''
+  trigger:
+  - platform: time
+    at: 07:00
+  condition:
+  - condition: state
+    entity_id: binary_sensor.workday_sensor
+    state: ''
+    attribute: workdays
+  action:
+  - service: switch.turn_on
+    target:
+      entity_id:
+      - switch.switch_1_i_koket
+      - switch.switch_2_i_allrumet
+      - switch.switch_3_i_vardagsrummet
+      - switch.switch_4_i_vardagsrummet
+      - switch.switch_5_i_vardagsrummet
+      - switch.switch_6_i_hallen
+      - switch.switch_7_vid_ytterdorren
+      - switch.switch_8_vid_tvattstugan
+      - switch.switch_9_till_baksidan
+      - switch.switch_10_till_gastrummet
+      - switch.switch_11_till_kontoret
+      - switch.switch_12_vid_altanen
+  mode: single
+- id: '1634837623481'
+  alias: Slack när solen går upp
+  description: ''
+  trigger:
+  - platform: sun
+    event: sunrise
+  condition: []
+  action:
+  - service: switch.turn_off
+    target:
+      entity_id:
+      - switch.switch_1_i_koket
+      - switch.switch_2_i_allrumet
+      - switch.switch_3_i_vardagsrummet
+      - switch.switch_4_i_vardagsrummet
+      - switch.switch_5_i_vardagsrummet
+      - switch.switch_6_i_hallen
+      - switch.switch_7_vid_ytterdorren
+      - switch.switch_8_vid_tvattstugan
+      - switch.switch_9_till_baksidan
+      - switch.switch_10_till_gastrummet
+      - switch.switch_11_till_kontoret
+      - switch.switch_12_vid_altanen
+  mode: single
+- id: '1634837623482'
+  alias: Tänd när solen går ner
+  description: ''
+  trigger:
+  - platform: sun
+    event: sunset
+  condition:
+  - condition: state
+    entity_id: binary_sensor.workday_sensor
+    state: ''
+    attribute: workdays
+  action:
+  - service: switch.turn_on
+    target:
+      entity_id:
+      - switch.switch_1_i_koket
+      - switch.switch_2_i_allrumet
+      - switch.switch_3_i_vardagsrummet
+      - switch.switch_4_i_vardagsrummet
+      - switch.switch_5_i_vardagsrummet
+      - switch.switch_6_i_hallen
+      - switch.switch_7_vid_ytterdorren
+      - switch.switch_8_vid_tvattstugan
+      - switch.switch_9_till_baksidan
+      - switch.switch_10_till_gastrummet
+      - switch.switch_11_till_kontoret
+      - switch.switch_12_vid_altanen
+  mode: single
+- id: '1634837623483'
+  alias: Släck på kvällen
+  description: ''
+  trigger:
+  - platform: time
+    at: '23:00'
+  condition: []
+  action:
+  - service: switch.turn_off
+    target:
+      entity_id:
+      - switch.switch_1_i_koket
+      - switch.switch_2_i_allrumet
+      - switch.switch_3_i_vardagsrummet
+      - switch.switch_4_i_vardagsrummet
+      - switch.switch_5_i_vardagsrummet
+      - switch.switch_6_i_hallen
+      - switch.switch_7_vid_ytterdorren
+      - switch.switch_8_vid_tvattstugan
+      - switch.switch_9_till_baksidan
+      - switch.switch_10_till_gastrummet
+      - switch.switch_11_till_kontoret
+      - switch.switch_12_vid_altanen
+  mode: single

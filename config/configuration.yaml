@@ -2,6 +2,10 @@
 # Configure a default setup of Home Assistant (frontend, api, etc)
 default_config:
 
+binary_sensor:
+  - platform: workday
+    country: SWE
+
 sensor:
   - platform: tellstick
     #  116: kallvind
