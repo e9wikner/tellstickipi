@@ -2,6 +2,10 @@
 # Configure a default setup of Home Assistant (frontend, api, etc)
 default_config:
 
+recorder:
+  purge_keep_days: 180
+  commit_interval: 30
+   
 binary_sensor:
   - platform: workday
     country: SWE
@@ -11,6 +15,12 @@ sensor:
     #  116: kallvind
     #  226: krypgrund
     #  240: utomhu
+  - platform: mqtt
+    name: Knappen
+    state_topic: shellies/shellybutton1-C45BBE6A5BF3/sensor/battery
+    unit_of_measurement: "%"
+    payload_available: online
+    payload_not_available: offline
 
 # Tellstick base component
 tellstick:

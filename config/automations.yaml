@@ -3,19 +3,17 @@
   description: ''
   trigger:
   - platform: time
-    at: 07:00
+    at: 07:30
   condition:
-  - condition: state
-    entity_id: binary_sensor.workday_sensor
-    state: ''
-    attribute: workdays
+  - condition: sun
+    before: sunrise
+    after: sunset
   action:
   - service: switch.turn_on
     target:
       entity_id:
       - switch.switch_1_i_koket
       - switch.switch_2_i_allrumet
-      - switch.switch_3_i_vardagsrummet
       - switch.switch_4_i_vardagsrummet
       - switch.switch_5_i_vardagsrummet
       - switch.switch_6_i_hallen
@@ -25,6 +23,7 @@
       - switch.switch_10_till_gastrummet
       - switch.switch_11_till_kontoret
       - switch.switch_12_vid_altanen
+      - switch.switch_3_i_vardagsrummet
   mode: single
 - id: '1634837623481'
   alias: Slack när solen går upp
@@ -39,7 +38,6 @@
       entity_id:
       - switch.switch_1_i_koket
       - switch.switch_2_i_allrumet
-      - switch.switch_3_i_vardagsrummet
       - switch.switch_4_i_vardagsrummet
       - switch.switch_5_i_vardagsrummet
       - switch.switch_6_i_hallen
@@ -49,6 +47,7 @@
       - switch.switch_10_till_gastrummet
       - switch.switch_11_till_kontoret
       - switch.switch_12_vid_altanen
+      - switch.switch_3_i_vardagsrummet
   mode: single
 - id: '1634837623482'
   alias: Tänd när solen går ner
@@ -57,17 +56,14 @@
   - platform: sun
     event: sunset
   condition:
-  - condition: state
-    entity_id: binary_sensor.workday_sensor
-    state: ''
-    attribute: workdays
+  - condition: time
+    before: '22:59'
   action:
   - service: switch.turn_on
     target:
       entity_id:
       - switch.switch_1_i_koket
       - switch.switch_2_i_allrumet
-      - switch.switch_3_i_vardagsrummet
       - switch.switch_4_i_vardagsrummet
       - switch.switch_5_i_vardagsrummet
       - switch.switch_6_i_hallen
@@ -77,6 +73,7 @@
       - switch.switch_10_till_gastrummet
       - switch.switch_11_till_kontoret
       - switch.switch_12_vid_altanen
+      - switch.switch_3_i_vardagsrummet
   mode: single
 - id: '1634837623483'
   alias: Släck på kvällen
@@ -84,14 +81,57 @@
   trigger:
   - platform: time
     at: '23:00'
-  condition: []
+  condition:
+  - condition: time
+    weekday:
+    - mon
+    - tue
+    - wed
+    - thu
+    - fri
+    - sat
+    - sun
   action:
   - service: switch.turn_off
     target:
       entity_id:
       - switch.switch_1_i_koket
-      - switch.switch_2_i_allrumet
+      - switch.switch_4_i_vardagsrummet
+      - switch.switch_5_i_vardagsrummet
+      - switch.switch_6_i_hallen
+      - switch.switch_7_vid_ytterdorren
+      - switch.switch_8_vid_tvattstugan
+      - switch.switch_9_till_baksidan
+      - switch.switch_10_till_gastrummet
+      - switch.switch_11_till_kontoret
+      - switch.switch_12_vid_altanen
       - switch.switch_3_i_vardagsrummet
+  mode: single
+- id: '1634837623484'
+  alias: Stang av standbygrejer
+  description: ''
+  trigger:
+  - platform: time
+    at: 01:00
+  action:
+  - service: switch.turn_off
+    target:
+      entity_id:
+      - switch.switch_3_i_vardagsrummet
+  mode: single
+- id: '1642883473750'
+  alias: Toggla belysning med shellyknapp
+  description: ''
+  trigger:
+  - platform: mqtt
+    topic: shellies/shellybutton1-C45BBE6A5BF3/input_event/0
+  condition: []
+  action:
+  - service: switch.toggle
+    target:
+      entity_id:
+      - switch.switch_1_i_koket
+      - switch.switch_2_i_allrumet
       - switch.switch_4_i_vardagsrummet
       - switch.switch_5_i_vardagsrummet
       - switch.switch_6_i_hallen
