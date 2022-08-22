@@ -20,7 +20,15 @@ Raspberry Pi 4 with openmediavault, home-assistant, syncthing, tellstick logging
   the entire install script you can run certain steps like this: 
   `sudo python3 -c "import install; install.deploy(); install.start()"`
 
-- Install OpenMediaVault:
+- Install home-assistant in docker container:
+    ```
+    sudo apt install docker docker-compose -y
+    sudo usermod -aG docker $USER
+    newgrp docker
+    docker-compose up -d
+    ```
+
+- Install OpenMediaVault (optional if you want a GUI to manage file shares and more):
   `wget -O - https://github.com/OpenMediaVault-Plugin-Developers/installScript/raw/master/install | sudo bash`
 
 - Configure OpenMediaVault and install docker from the web interface
@@ -29,11 +37,8 @@ Raspberry Pi 4 with openmediavault, home-assistant, syncthing, tellstick logging
   - Install plugins
   - Mount external filesystem
 
-- Create link to syncthing root:
-  `sudo ln -s /srv/dev-disk-by-label-external/ syncthing_volume`
-
 - Launch:
-  `USERID=$(id -u):$(id -g) docker-compose up -d`
+  `docker-compose up -d`
 
 - Backup:
   `git clone https://github.com/billw2/rpi-clone.git`
