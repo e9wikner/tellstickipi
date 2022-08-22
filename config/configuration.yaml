@@ -8,7 +8,7 @@ recorder:
    
 binary_sensor:
   - platform: workday
-    country: SWE
+    country: SE
 
 sensor:
   - platform: tellstick
