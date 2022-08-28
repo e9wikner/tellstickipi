@@ -142,3 +142,98 @@
       - switch.switch_11_till_kontoret
       - switch.switch_12_vid_altanen
   mode: single
+- id: '1661340042356'
+  alias: Smartladdning
+  description: ''
+  trigger:
+  - type: battery_level
+    platform: device
+    device_id: f7671d8ade8f586f6fe9efdcf0aaa1dd
+    entity_id: sensor.stefans_ipad_battery_level
+    domain: sensor
+    above: 51
+  condition:
+  - condition: state
+    entity_id: switch.switch_13_laddare_i_k
+    state: 'on'
+  action:
+  - service: switch.turn_off
+    data: {}
+    target:
+      entity_id: switch.switch_13_laddare_i_k
+  mode: restart
+- id: '1661341433509'
+  alias: Smartladdning, stoppa iPad eller Gottepåsen
+  description: ''
+  trigger:
+  - type: battery_level
+    platform: device
+    device_id: f7671d8ade8f586f6fe9efdcf0aaa1dd
+    entity_id: sensor.stefans_ipad_battery_level
+    domain: sensor
+    above: 69
+  - type: battery_level
+    platform: device
+    device_id: 60980865acb7a9a3fda5985fa788f6d6
+    entity_id: sensor.gottepasen_battery_level
+    domain: sensor
+    above: 80
+    enabled: true
+  condition: []
+  action:
+  - service: switch.turn_off
+    data: {}
+    target:
+      entity_id: switch.switch_13_laddare_i_k
+  mode: restart
+- id: '1661343087511'
+  alias: Smartladdning, iPad start
+  description: ''
+  trigger:
+  - type: battery_level
+    platform: device
+    device_id: f7671d8ade8f586f6fe9efdcf0aaa1dd
+    entity_id: sensor.stefans_ipad_battery_level
+    domain: sensor
+    below: 10
+  condition: []
+  action:
+  - service: switch.turn_on
+    data: {}
+    target:
+      entity_id: switch.switch_13_laddare_i_k
+  mode: restart
+- id: '1661348298110'
+  alias: Smartladdning, Tesla start
+  description: ''
+  trigger:
+  - type: value
+    platform: device
+    device_id: ab44d6e858e0f4611d143dd9312ef62d
+    entity_id: sensor.electricity_price_planasvagen_7
+    domain: sensor
+    below: 0.4
+  condition: []
+  action:
+  - type: turn_on
+    device_id: 2a23594e3f5c3ece187fec45b7faa2bb
+    entity_id: switch.ehvkbqzz_is_enabled
+    domain: switch
+  mode: restart
+- id: '1661371528321'
+  alias: Smartladdning, Tesla stop
+  description: ''
+  trigger:
+  - type: value
+    platform: device
+    device_id: ab44d6e858e0f4611d143dd9312ef62d
+    entity_id: sensor.electricity_price_planasvagen_7
+    domain: sensor
+    above: 0.5
+  condition: []
+  action:
+  - type: turn_off
+    device_id: 2a23594e3f5c3ece187fec45b7faa2bb
+    entity_id: switch.ehvkbqzz_is_enabled
+    domain: switch
+  mode: restart

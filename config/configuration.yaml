@@ -5,7 +5,7 @@ default_config:
 recorder:
   purge_keep_days: 180
   commit_interval: 30
-   
+
 binary_sensor:
   - platform: workday
     country: SE
@@ -21,6 +21,41 @@ sensor:
     unit_of_measurement: "%"
     payload_available: online
     payload_not_available: offline
+
+  # - platform: rest
+  #   name: Tibber elpris
+  #   resource: https://api.tibber.com/v1-beta/gql
+  #   method: POST
+  #   payload: '{ "query": "{viewer {homes {currentSubscription {priceInfo {today {total startsAt } tomorrow {total startsAt} }}}}}" }'
+  #   json_attributes_path: "$.data.viewer.homes[0].currentSubscription.priceInfo"
+  #   json_attributes:
+  #     - today
+  #     - tomorrow
+  #   scan_interval: 86400
+  #   value_template: Ok
+  #   headers:
+  #     Authorization: !secret tibber_token
+  #     Content-Type: application/json
+  #     User-Agent: REST
+
+  # - platform: template
+  #   sensors:
+  #     tibber_elpris:
+  #       friendly_name: "Timpris"
+  #       value_template: >
+  #         {% set pris_today = state_attr('sensor.tibber_elpris', 'today') %}
+  #         {% for item in pris_today %}
+  #           {{ item.total }}
+  #         {% endfor %}
+  #     elpris_datum:
+  #       friendly_name: "Timpris datum"
+  #       value_template: >
+  #         {% set pris_today = state_attr('sensor.tibber_elpris', 'today') %}
+  #         {% for item in pris_today %}
+  #           {{ item.startsAt }}
+  #         {% endfor %}
+
+
 
 # Tellstick base component
 tellstick:
