@@ -12,9 +12,13 @@ binary_sensor:
 
 sensor:
   - platform: tellstick
-    #  116: kallvind
-    #  226: krypgrund
-    #  240: utomhu
+    only_named:
+      - id: 190
+        name: Torpargrund
+      - id: 240
+        name: Utomhus
+      - id: 113
+        name: Inomhus
   - platform: mqtt
     name: Knappen
     state_topic: shellies/shellybutton1-C45BBE6A5BF3/sensor/battery

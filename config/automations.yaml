@@ -3,7 +3,7 @@
   description: ''
   trigger:
   - platform: time
-    at: 07:30
+    at: 06:30:00
   condition:
   - condition: sun
     before: sunrise
@@ -24,6 +24,7 @@
       - switch.switch_11_till_kontoret
       - switch.switch_12_vid_altanen
       - switch.switch_3_i_vardagsrummet
+    data: {}
   mode: single
 - id: '1634837623481'
   alias: Slack när solen går upp
@@ -81,6 +82,8 @@
   trigger:
   - platform: time
     at: '23:00'
+  - platform: event
+    event_type: sovdags
   condition:
   - condition: time
     weekday:
@@ -106,6 +109,7 @@
       - switch.switch_11_till_kontoret
       - switch.switch_12_vid_altanen
       - switch.switch_3_i_vardagsrummet
+    data: {}
   mode: single
 - id: '1634837623484'
   alias: Stang av standbygrejer
@@ -179,6 +183,12 @@
     domain: sensor
     above: 80
     enabled: true
+  - type: battery_level
+    platform: device
+    device_id: 0ac43a1363ac3e73aae843af0384a680
+    entity_id: sensor.satans_pafund_battery_level
+    domain: sensor
+    above: 69
   condition: []
   action:
   - service: switch.turn_off
