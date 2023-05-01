@@ -3,6 +3,7 @@
 *.pyc
 .idea/
 .vscode/
+.venv/
 config/.*
 config/blueprints/*
 config/secrets.yaml
