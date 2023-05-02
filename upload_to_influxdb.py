@@ -50,18 +50,13 @@ def setup_logging(verbose):
 
 
 def main(args):
-    client = InfluxDBClient(url=args.url, token=args.token, org=args.org)
-    write_api = client.write_api()
-
-    log.info("Reading line protocol data from stdin")
-    data = sys.stdin.read()
-
-    log.info("Writing data to InfluxDB")
-    write_api.write(bucket=args.bucket, record=data)
-
-    log.info("Data upload complete")
-    write_api.close()
-    client.close()
+    with InfluxDBClient(url=args.url, token=args.token, org=args.org) as client:
+        with client.write_api() as write_api:
+            log.info("Reading line protocol data from stdin")
+            data = sys.stdin.read()
+            log.info("Writing data to InfluxDB")
+            write_api.write(bucket=args.bucket, record=data, write_precision="s")
+            log.info("Data upload complete")
 
 
 if __name__ == "__main__":

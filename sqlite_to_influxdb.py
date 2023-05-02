@@ -59,7 +59,7 @@ def convert_timestamp(timestamp_str):
 
 def convert_to_influxdb(sensor_id, rows, tags=None):
     for value, timestamp_str in rows:
-        if value.lower() == "unknown":
+        if value.lower() in {"unknown", "unavailable"}:
             continue
         converted_value = convert_value(value)
         timestamp = convert_timestamp(timestamp_str)
