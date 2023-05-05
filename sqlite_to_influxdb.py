@@ -2,16 +2,25 @@ import argparse
 import logging
 import sqlite3
 import sys
-from datetime import datetime
+from contextlib import suppress
+from datetime import datetime, timedelta
+from pathlib import Path
 
 log = logging.getLogger(__name__)
 
 
-def get_sensor_data(conn, sensor):
+def get_sensor_data(conn, sensor, hours=None):
     cur = conn.cursor()
-    cur.execute(
-        f"SELECT state, last_updated FROM states WHERE entity_id = '{sensor}' AND state != 'unknown' ORDER BY last_updated DESC"
-    )
+    if hours:
+        start_time = datetime.now() - timedelta(hours=hours)
+        cur.execute(
+            f"SELECT state, last_updated FROM states WHERE entity_id = '{sensor}' AND state != 'unknown' AND last_updated >= ? ORDER BY last_updated DESC",
+            (start_time,),
+        )
+    else:
+        cur.execute(
+            f"SELECT state, last_updated FROM states WHERE entity_id = '{sensor}' AND state != 'unknown' ORDER BY last_updated DESC"
+        )
     return cur.fetchall()
 
 
@@ -26,9 +35,6 @@ def parse_tags(tag_string):
             key, value = tag.split("=")
             tags[key.strip()] = value.strip()
     return tags
-
-
-from contextlib import suppress
 
 
 def convert_value(value):
@@ -49,7 +55,8 @@ def convert_value(value):
     elif value.lower() in {"off", "false", "no"}:
         return "false"
     else:
-        return f'"{value}"'
+        escaped_value = value.replace("\n", "\\n")
+        return f'"{escaped_value}"'
 
 
 def convert_timestamp(timestamp_str):
@@ -88,6 +95,16 @@ def get_args():
         "--tags",
         help="Add tags to the line protocol format. Use comma-separated key-value pairs, e.g., tag1=value1,tag2=value2",
     )
+    parser.add_argument(
+        "--to-path",
+        help="Print to files in this directory instead of writing it all to stdout."
+    )
+    parser.add_argument(
+        "--hours",
+        type=int,
+        help="Limit the timestamp to a certain number of hours back",
+        default=None,
+    )
     return parser.parse_args()
 
 
@@ -108,9 +125,14 @@ def main(args):
         logging.warning("Empty list of sensors")
     tags = parse_tags(args.tags)
     for sensor in args.sensors:
-        rows = get_sensor_data(conn, sensor)
+        rows = get_sensor_data(conn, sensor, args.hours)
         log.info(f"Found {len(rows)} rows for sensor {sensor}")
-        print("\n".join(convert_to_influxdb(sensor, rows, tags)))
+        lines = convert_to_influxdb(sensor, rows, tags)
+        if args.to_path:
+            path = Path(args.to_path) / f"{sensor}.lineproto"
+            path.write_text("\n".join(lines))
+        else:
+            print("\n".join(lines))
 
 
 if __name__ == "__main__":
