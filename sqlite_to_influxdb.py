@@ -70,6 +70,8 @@ def convert_to_influxdb(sensor_id, rows, tags=None):
             continue
         converted_value = convert_value(value)
         timestamp = convert_timestamp(timestamp_str)
+        if "." in sensor_id:
+            _, sensor_id = sensor_id.split(".")
         if tags:
             tag_set = ",".join([f"{k}={v}" for k, v in tags.items()]) if tags else ""
             yield f"{sensor_id},{tag_set} value={converted_value} {timestamp}"
