@@ -8,5 +8,6 @@
 config/bacups/*
 config/blueprints/*
 config/secrets.yaml
+config/tmp/*
 *.log*
 *.db*
