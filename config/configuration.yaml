@@ -19,12 +19,12 @@ sensor:
         name: Utomhus
       - id: 113
         name: Inomhus
-  - platform: mqtt
-    name: Knappen
-    state_topic: shellies/shellybutton1-C45BBE6A5BF3/sensor/battery
-    unit_of_measurement: "%"
-    payload_available: online
-    payload_not_available: offline
+  # - platform: mqtt
+  #   name: Knappen
+  #   state_topic: shellies/shellybutton1-C45BBE6A5BF3/sensor/battery
+  #   unit_of_measurement: "%"
+  #   payload_available: online
+  #   payload_not_available: offline
 
   # - platform: rest
   #   name: Tibber elpris
@@ -69,8 +69,8 @@ switch:
   - platform: tellstick
 
 # Text to speech
-tts:
-  - platform: google_translate
+# tts:
+#   - platform: google_translate
 
 group: !include groups.yaml
 automation: !include automations.yaml

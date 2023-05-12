@@ -8,6 +8,7 @@ Raspberry Pi 4 with openmediavault, home-assistant, syncthing, tellstick logging
 - Enable ssh if you are not connecting the PI to a screen and keyboard, https://www.raspberrypi.org/documentation/remote-access/ssh/README.md
 - Boot up the PI and login.
 - Run `raspi-config` and configure the basics of you Pi.
+- sudo timedatectl set-timezone Europe/Stockholm
 - Secure the Pi, see https://www.raspberrypi.org/documentation/configuration/security.md
 - Update and install dependencies and _tellstickipi_:
     ```
