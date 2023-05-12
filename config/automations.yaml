@@ -247,3 +247,12 @@
     entity_id: switch.ehvkbqzz_is_enabled
     domain: switch
   mode: restart
+- id: '1234567890123'
+  alias: "Push data to InfluxDB every hour"
+  trigger:
+    platform: time_pattern
+    hours: '/1'  # every hour
+  action:
+    - service: shell_command.list_sensors
+    - service: shell_command.run_sqlite_to_influxdb
+    - service: shell_command.run_upload_to_influxdb

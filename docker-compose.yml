@@ -13,6 +13,11 @@ services:
         privileged: true
         environment:
             - TZ=Europe/Stockholm
+            - INFLUXDB_URL=${INFLUXDB_URL}
+            - INFLUXDB_TOKEN=${INFLUXDB_TOKEN}
+            - INFLUXDB_ORG=${INFLUXDB_ORG}
+            - INFLUXDB_BUCKET=${INFLUXDB_BUCKET}
+            - INFLUXDB_HOURS_TO_PUSH=${INFLUXDB_HOURS_TO_PUSH}
         restart: always
         network_mode: host
 

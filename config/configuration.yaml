@@ -59,6 +59,33 @@ sensor:
   #           {{ item.startsAt }}
   #         {% endfor %}
 
+# Publish data to influxdb server
+default:
+  tmp_script_folder: &tmp_script_folder /config/tmp/homeassistant_db_to_influx
+  db_path: &db_path /config/home-assistant_v2.db
+shell_command:
+  list_sensors:
+    command: >
+      rm -Rf *tmp_script_folder &&
+      mkdir -p *tmp_script_folder &&
+      python3 /config/python_scripts/ls_sensors.py *db_path
+      > *tmp_script_folder/sensors.txt
+  run_sqlite_to_influxdb:
+    command: >
+      mkdir -p *tmp_script_folder && 
+      python3 /config/tellstickipi/sqlite_to_influxdb.py 
+      --to-path *tmp_script_folder 
+      --hours $INFLUXDB_HOURS_TO_PUSH
+      *db_path
+      < /config/tellstickipi/sensors.txt
+  run_upload_to_influxdb:
+    command: >
+      python3 /config/tellstickipi/upload_to_influxdb.py 
+      --url $INFLUXDB_URL
+      --token $INFLUXDB_TOKEN 
+      --org $INFLUXDB_ORG 
+      --bucket $INFLUXDB_BUCKET 
+      --from-path *tmp_script_folder
 
 
 # Tellstick base component

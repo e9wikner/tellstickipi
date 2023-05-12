@@ -21,6 +21,14 @@ Raspberry Pi 4 with openmediavault, home-assistant, syncthing, tellstick logging
   the entire install script you can run certain steps like this: 
   `sudo python3 -c "import install; install.deploy(); install.start()"`
 
+- Create the .env file used for configuration in the root directory of the project:
+    ```env
+    INFLUXDB_TOKEN=your_influxdb_token
+    INFLUXDB_ORG=your_influxdb_organization
+    INFLUXDB_BUCKET=your_influxdb_bucket
+    INFLUXDB_HOURS_TO_PUSH=your_value_for_hours
+    ```
+
 - Install home-assistant in docker container:
     ```
     sudo apt install docker docker-compose -y
