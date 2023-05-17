@@ -106,7 +106,7 @@ def get_args():
         "--hours",
         type=int,
         help="Limit the timestamp to a certain number of hours back",
-        default=None,
+        default=os.environ.get("INFLUXDB_HOURS_TO_PUSH", None),
     )
     return parser.parse_args()
 
