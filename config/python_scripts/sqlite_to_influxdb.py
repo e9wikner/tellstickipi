@@ -90,6 +90,7 @@ def get_args():
         nargs="*",
         help="Entity IDs of the sensors to convert",
     )
+    parser.add_argument("--sensors-from-file", help="Get list of sensors from this file")
     parser.add_argument(
         "-v", "--verbose", action="store_true", help="Increase output verbosity"
     )
@@ -120,13 +121,24 @@ def setup_logging(verbose):
 
 
 def main(args):
-    conn = get_conn(args.db_file)
-    if not args.sensors:
+
+    sensors = []
+    if args.sensors:
+        sensors += args.sensors
+    if args.sensors_from_file:
+        sensors_file = Path(args.sensors_from_file)
+        sensors += [s.strip() for s in sensors_file.read_text().splitlines()]
+
+    if not args.sensors and not args.sensors_from_file:
         args.sensors = [sensor.strip() for sensor in sys.stdin.readlines()]
-    if not args.sensors:
-        logging.warning("Empty list of sensors")
+
+    if not sensors:
+        logging.error("Empty list of sensors")
+    logging.info("Sensors: " + ", ".join(sensors))
+
     tags = parse_tags(args.tags)
-    for sensor in args.sensors:
+    conn = get_conn(args.db_file)
+    for sensor in sensors:
         rows = get_sensor_data(conn, sensor, args.hours)
         log.info(f"Found {len(rows)} rows for sensor {sensor}")
         lines = convert_to_influxdb(sensor, rows, tags)

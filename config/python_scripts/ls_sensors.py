@@ -19,8 +19,14 @@ def get_sensor_ids(db_path, sensor_id):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('db_path', help='Path to Home Assistant sqlite database')
-    parser.add_argument('--sensor_id', default='sensor.%', help='Sensor entity ID (default: sensor.%)')
+    parser.add_argument('--sensor-id', default='sensor.%', help='Sensor entity ID (default: sensor.%)')
+    parser.add_argument('--to-file', help="Print to this file instead of stdout")
     args = parser.parse_args()
 
     sensor_ids = get_sensor_ids(args.db_path, args.sensor_id)
-    print("\n".join(sensor_ids))
+
+    if args.to_file:
+        with open(args.to_file, mode="w") as f:
+            f.write("\n".join(sensor_ids))
+    else:
+        print("\n".join(sensor_ids))
